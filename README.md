@@ -3,6 +3,10 @@ Set up:
 uv sync
 ```
 
+```
+uv run scripts/install_vietnamese_sbert.py
+```
+
 Run server:
 ```
 uv run server.py

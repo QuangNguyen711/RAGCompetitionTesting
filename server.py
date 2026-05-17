@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import faiss
 import numpy as np
 import uvicorn
@@ -7,9 +9,10 @@ from sentence_transformers import SentenceTransformer
 from openai import OpenAI
 
 # ================= CẤU HÌNH =================
-SERVER_URL = "http://127.0.0.1:8000"  # IP Server Ban tổ chức
-STUDENT_ID = "B21DCCN629"             # Mã sinh viên
+SERVER_URL = "http://192.168.50.218:8000"  # IP Server Ban tổ chức
+STUDENT_ID = "B22DCKH060"             # Mã sinh viên
 LOCAL_PORT = 3636                     # Port chạy server của sinh viên 
+LOCAL_MODEL_DIR = Path(__file__).resolve().parent / "models" / "vietnamese-sbert"
 
 # ================= BIẾN TOÀN CỤC =================
 app = FastAPI()
@@ -32,7 +35,11 @@ def chunk_text(text, chunk_size=150, overlap=30):
 def startup_event():
     global embed_model, client
     print("🚀 Đang tải mô hình Embedding và kết nối Proxy LLM...")
-    embed_model = SentenceTransformer('keepitreal/vietnamese-sbert')
+    if not LOCAL_MODEL_DIR.exists():
+        raise RuntimeError(
+            "Local model not found. Run scripts/install_vietnamese_sbert.py first."
+        )
+    embed_model = SentenceTransformer(str(LOCAL_MODEL_DIR))
     client = OpenAI(
         base_url=f"{SERVER_URL}/api/v1/proxy", 
         api_key=STUDENT_ID

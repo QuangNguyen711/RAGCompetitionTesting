@@ -1,8 +1,8 @@
 import requests
 
 # ================= CẤU HÌNH =================
-SERVER_URL = "http://127.0.0.1:8000"
-STUDENT_ID = "B21DCCN629"
+SERVER_URL = "http://192.168.50.218:8000"  # IP Server Ban tổ chức
+STUDENT_ID = "B22DCKH060"             # Mã sinh viên
 LOCAL_PORT = 3636
 LOCAL_URL = f"http://127.0.0.1:{LOCAL_PORT}"
 
