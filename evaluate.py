@@ -1,8 +1,8 @@
 import requests
 
 # ================= CẤU HÌNH =================
-SERVER_URL = "http://192.168.50.218:8000"  # IP Server Ban tổ chức
-STUDENT_ID = "B22DCKH060"             # Mã sinh viên
+SERVER_URL = "http://127.0.0.1:8000"  # IP Server Ban tổ chức
+STUDENT_ID = "B21DCCN001"             # Mã sinh viên
 
 HEADERS = {"X-Student-ID": STUDENT_ID}
 
@@ -11,6 +11,7 @@ def trigger_evaluation():
         print("🚀 Đang gửi yêu cầu Kích hoạt luồng Test đến Server...")
         res_eval = requests.post(
             f"{SERVER_URL}/api/v1/competition/evaluate",
+            json={"document_received": True},
             headers=HEADERS
         )
         print("🎯 Kích hoạt thành công! BTC chuẩn bị gọi vào /upload và /ask của bạn...", res_eval.json())
