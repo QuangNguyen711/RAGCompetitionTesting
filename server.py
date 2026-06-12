@@ -26,24 +26,24 @@ index = None
 chunks = []
 
 def chunk_text(text, chunk_size=500, overlap=50):
-    # laws = text.split("###")
-    # chunks_list = []
-    # for law in laws:
-    #     words = law.split()
-    #     for i in range(0, len(words), chunk_size - overlap):
-    #         chunk = " ".join(words[i : i + chunk_size])
-    #         chunks_list.append(chunk)
-    #         if i + chunk_size >= len(words):
-    #             break
-    # return chunks_list
+    laws = text.split("###")
     chunks_list = []
-    words = text.split()
-    for i in range(0, len(words), chunk_size - overlap):
-        chunk = " ".join(words[i : i + chunk_size])
-        chunks_list.append(chunk)
-        if i + chunk_size >= len(words):
-            break
+    for law in laws:
+        words = law.split()
+        for i in range(0, len(words), chunk_size - overlap):
+            chunk = " ".join(words[i : i + chunk_size])
+            chunks_list.append(chunk)
+            if i + chunk_size >= len(words):
+                break
     return chunks_list
+    # chunks_list = []
+    # words = text.split()
+    # for i in range(0, len(words), chunk_size - overlap):
+    #     chunk = " ".join(words[i : i + chunk_size])
+    #     chunks_list.append(chunk)
+    #     if i + chunk_size >= len(words):
+    #         break
+    # return chunks_list
 
 @app.on_event("startup")
 def startup_event():
@@ -156,7 +156,7 @@ def receive_question(data: AskRequest):
 
     # 1. Retrieval
     q_emb = embed_model.encode([data.question])
-    distances, indices = index.search(np.array(q_emb).astype('float32'), k=3)
+    distances, indices = index.search(np.array(q_emb).astype('float32'), k=5)
     
     retrieved_contexts = [chunks[idx] for idx in indices[0]]
     context_str = "\n---\n".join(retrieved_contexts)
@@ -168,24 +168,24 @@ def receive_question(data: AskRequest):
     # context_str = ""
 
     # 2. Prompting
-#     prompt = f"""Dựa vào thông tin sau đây:
-# {context_str}
-
-# Hãy trả lời câu hỏi trắc nghiệm dưới đây. GIẢI THÍCH VÀ TRẢ LỜI ĐÚNG 1 KÝ TỰ (A, B, C, D)
-# Câu hỏi:
-# {data.question}
-
-# Mẫu trả lời:
-# Suy luận: ...
-# Đáp án: X
-# """
-
     prompt = f"""Dựa vào thông tin sau đây:
 {context_str}
 
-Hãy trả lời câu hỏi trắc nghiệm dưới đây. TRẢ LỜI ĐÚNG 1 KÝ TỰ (A, B, C, D), không giải thích!
+Hãy trả lời câu hỏi trắc nghiệm dưới đây. GIẢI THÍCH VÀ TRẢ LỜI ĐÚNG 1 KÝ TỰ (A, B, C, D)
 Câu hỏi:
-{data.question}"""
+{data.question}
+
+Mẫu trả lời:
+Suy luận: ...
+Đáp án: X
+"""
+
+#     prompt = f"""Dựa vào thông tin sau đây:
+# {context_str}
+
+# Hãy trả lời câu hỏi trắc nghiệm dưới đây. TRẢ LỜI ĐÚNG 1 KÝ TỰ (A, B, C, D), không giải thích!
+# Câu hỏi:
+# {data.question}"""
 
     llm_response = client.chat.completions.create(
         model="any",
@@ -196,7 +196,7 @@ Câu hỏi:
     raw_answer = llm_response.choices[0].message.content.strip().upper()
     print(f"   => Proxy LLM trả về: {raw_answer}")
 
-    # raw_answer = raw_answer.split("ĐÁP ÁN:")[-1].strip()  # Cố gắng lọc ra ký tự sau "Đáp án:"
+    raw_answer = raw_answer.split("ĐÁP ÁN:")[-1].strip()  # Cố gắng lọc ra ký tự sau "Đáp án:"
     # 3. Lọc đáp án
     final_answer = "X" 
     for char in raw_answer:

@@ -11,7 +11,7 @@ def trigger_evaluation():
         print("🚀 Đang gửi yêu cầu Kích hoạt luồng Test đến Server...")
         res_eval = requests.post(
             f"{SERVER_URL}/api/v1/competition/evaluate",
-            json={"document_received": True},
+            json={"document_received": False},
             headers=HEADERS
         )
         print("🎯 Kích hoạt thành công! BTC chuẩn bị gọi vào /upload và /ask của bạn...", res_eval.json())
